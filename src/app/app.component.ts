@@ -111,12 +111,12 @@ export interface Utente {
     </div>
     
     <!-- Modale di Conferma Eliminazione -->
-    @if (userToDelete()) {
+    @if (userToDelete() ; as user) {
       <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full">
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Conferma Eliminazione</h3>
           <p class="text-gray-700 dark:text-gray-300 mb-6">
-            Sei sicuro di voler eliminare l'utente <strong>{{ userToDelete().name }}</strong> (ID: {{ userToDelete().id }})? Questa operazione è irreversibile.
+            Sei sicuro di voler eliminare l'utente <strong>{{ user.name }}</strong> (ID: {{ user.id }})? Questa operazione è irreversibile.
           </p>
           <div class="flex justify-end gap-3">
             <button
@@ -126,7 +126,7 @@ export interface Utente {
               Annulla
             </button>
             <button
-              (click)="deleteUtente(userToDelete().id)"
+              (click)="deleteUtente(user.id)"
               [disabled]="isLoading()"
               class="px-4 py-2 text-white font-semibold rounded-lg shadow-md transition duration-300
                      bg-red-600 hover:bg-red-700 disabled:bg-red-300 focus:outline-none focus:ring-4 focus:ring-red-500/50"
@@ -152,7 +152,7 @@ export interface Utente {
     `,
   ],
 })
-export class App {
+export class AppComponent { // <-- Rinomina la classe in AppComponent
   private apiService = inject(ApiService);
 
   // Stato dell'applicazione con Signals

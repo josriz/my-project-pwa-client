@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 // URL di base dell'API (Render aggiunge l'URL del dominio)
-// *** SOSTITUISCI QUESTO URL CON L'URL DEL TUO SERVIZIO BACKEND SU RENDER ***
-const API_BASE_URL = 'https://my-project-api.onrender.com'; 
+// Adesso è impostato sull'URL del servizio Backend: https://test-api-utenti.onrender.com
+const API_BASE_URL = 'https://test-api-utenti.onrender.com'; 
 
 @Injectable({
   providedIn: 'root'

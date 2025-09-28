@@ -13,7 +13,8 @@ export interface Utente {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  // Rimuovo HttpClient qui, perché lo stiamo iniettando in app.config.ts
+  imports: [CommonModule, FormsModule], 
   template: `
     <!-- HTML del Componente -->
     <div class="p-4 sm:p-6 md:p-8 min-h-screen bg-gray-100 dark:bg-gray-900 font-inter">
@@ -89,7 +90,9 @@ export interface Utente {
             @for (utente of utenti(); track utente.id) {
               <li class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition duration-200">
                 <div class="flex flex-col">
-                  <span class="text-lg font-medium text-gray-900 dark:text-white">{{ utente.name }}</span>
+                  <!-- USO UN FALLBACK se il nome non esiste -->
+                  <span class="text-lg font-medium text-gray-900 dark:text-white">{{ utente.name || '[NOME NON DISPONIBILE]' }}</span>
+                  <!-- FORMATTAZIONE DATA SICURA -->
                   <span class="text-xs text-gray-500 dark:text-gray-400">ID: {{ utente.id }} | Aggiunto il {{ formatDate(utente.created_at) }}</span>
                 </div>
                 <!-- Pulsante Elimina -->
@@ -116,7 +119,7 @@ export interface Utente {
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full">
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Conferma Eliminazione</h3>
           <p class="text-gray-700 dark:text-gray-300 mb-6">
-            Sei sicuro di voler eliminare l'utente <strong>{{ user.name }}</strong> (ID: {{ user.id }})? Questa operazione è irreversibile.
+            Sei sicuro di voler eliminare l'utente <strong>{{ user.name || '[Nome mancante]' }}</strong> (ID: {{ user.id }})? Questa operazione è irreversibile.
           </p>
           <div class="flex justify-end gap-3">
             <button
@@ -152,7 +155,7 @@ export interface Utente {
     `,
   ],
 })
-export class AppComponent { // <-- Rinomina la classe in AppComponent
+export class AppComponent {
   private apiService = inject(ApiService);
 
   // Stato dell'applicazione con Signals
@@ -165,11 +168,9 @@ export class AppComponent { // <-- Rinomina la classe in AppComponent
   userToDelete: WritableSignal<Utente | null> = signal(null);
 
   constructor() {
-    // Carica gli utenti immediatamente all'avvio del componente
     this.getUtenti();
   }
 
-  // Metodo per recuperare gli utenti (GET)
   getUtenti() {
     this.isLoading.set(true);
     this.errorMessage.set(null);
@@ -187,7 +188,6 @@ export class AppComponent { // <-- Rinomina la classe in AppComponent
     });
   }
 
-  // Metodo per aggiungere un nuovo utente (POST)
   addUtente() {
     const name = this.nomeUtente().trim();
     if (!name) return;
@@ -197,9 +197,8 @@ export class AppComponent { // <-- Rinomina la classe in AppComponent
 
     this.apiService.addUtente(name).subscribe({
       next: (newUser) => {
-        // Aggiunge il nuovo utente all'inizio della lista locale
         this.utenti.update(users => [newUser, ...users]);
-        this.nomeUtente.set(''); // Resetta il campo di input
+        this.nomeUtente.set('');
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -210,40 +209,41 @@ export class AppComponent { // <-- Rinomina la classe in AppComponent
     });
   }
   
-  // Funzione per mostrare la modale di conferma (prepara l'utente da eliminare)
   confirmDelete(utente: Utente) {
     this.userToDelete.set(utente);
   }
 
-  // Funzione per chiudere la modale
   cancelDelete() {
     this.userToDelete.set(null);
   }
 
-  // NUOVO Metodo per eliminare un utente (DELETE)
   deleteUtente(id: number) {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     this.apiService.deleteUtente(id).subscribe({
       next: () => {
-        // Rimuove l'utente dalla lista locale
         this.utenti.update(users => users.filter(u => u.id !== id));
-        this.userToDelete.set(null); // Chiude la modale
+        this.userToDelete.set(null);
         this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Errore nell\'eliminazione dell\'utente:', error);
-        this.errorMessage.set('Errore durante l\'eliminazione: ' + (error.error?.error || 'Verifica il Backend.'));
+        // Mostra un errore chiaro per l'utente, collegato al problema DELETE sul Backend
+        this.errorMessage.set('Errore durante l\'eliminazione: Il Backend non ha ancora la funzione DELETE attiva o ha un errore. Fai il push di server.js.');
         this.userToDelete.set(null);
         this.isLoading.set(false);
       },
     });
   }
 
-  // Formatta la data per una visualizzazione più pulita
+  // Corretto per gestire stringhe di data non valide
   formatDate(dateStr: string): string {
+    if (!dateStr) return 'N/D';
     const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return 'Data non valida';
+    }
     return date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString('it-IT');
   }
 }

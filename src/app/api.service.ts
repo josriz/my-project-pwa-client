@@ -9,8 +9,8 @@ import { Utente } from './app.component'; // Importa l'interfaccia
 export class ApiService {
   private http = inject(HttpClient);
   
-  // *** CRUCIALE: SOSTITUISCI CON IL TUO URL API DI RENDER (es. https://test-api-utenti.onrender.com) ***
-  private apiUrl = 'https://test-api-utenti.onrender.com/utenti'; 
+  // *** HO AGGIUNTO /api/ nel percorso dell'API ***
+  private apiUrl = 'https://test-api-utenti.onrender.com/api/utenti'; 
 
   // Metodo GET: Recupera tutti gli utenti
   getUtenti(): Observable<Utente[]> {

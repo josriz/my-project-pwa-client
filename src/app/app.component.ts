@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from './api.service';
 import { FormsModule } from '@angular/forms';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy } from '@angular/core';
 
 // Definizione dell'interfaccia per l'utente, allineata al Backend PostgreSQL in italiano
 interface Utente {
@@ -85,7 +86,7 @@ interface Utente {
                   {{ utente.nome || '[NOME NON DISPONIBILE]' }}
                 </span>
                 <span class="text-sm text-gray-500">
-                  ID: {{ utente.id }} | Aggiunto il {{ utente.data_creazione | date: 'dd/MM/yyyy HH:mm' : undefined : 'it-IT' || 'N/D' }}
+                  ID: {{ utente.id }} | Aggiunto il {{ utente.data_creazione ? (utente.data_creazione | date: 'dd/MM/yyyy HH:mm' : undefined : 'it-IT') : 'N/D' }}
                 </span>
               </div>
               
@@ -129,6 +130,8 @@ interface Utente {
       </div>
     </div>
   `,
+  // Aggiunto changeDetection per performance (anche se facoltativo)
+  changeDetection: ChangeDetectionStrategy.OnPush, 
   styleUrls: ['./app.component.css'],
   providers: [DatePipe] // Fornisce DatePipe per la formattazione
 })

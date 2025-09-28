@@ -1,42 +1,32 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Utente } from './app.component'; // Importa l'interfaccia (Definita in app.component.ts)
+
+// URL di base dell'API (Render aggiunge l'URL del dominio)
+const API_BASE_URL = ''; 
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ApiService {
-  private http = inject(HttpClient);
 
-  // CRUCIALE: Percorso relativo corretto che Render reindirizza al Backend
-  // Abbiamo rimosso l'URL completo per usare il reindirizzamento di Render
-  private apiUrl = '/api/utenti';
+  constructor(private http: HttpClient) { }
 
-  /**
-   * Recupera tutti gli utenti dal Backend.
-   * @returns Un Observable di array di Utente.
-   */
-  getUtenti(): Observable<Utente[]> {
-    return this.http.get<Utente[]>(this.apiUrl);
+  // Recupera tutti gli utenti
+  getUtenti(): Observable<any[]> {
+    // Usa il percorso Backend corretto: /api/utenti
+    return this.http.get<any[]>(`${API_BASE_URL}/api/utenti`);
   }
 
-  /**
-   * Aggiunge un nuovo utente al Backend.
-   * @param name Il nome del nuovo utente.
-   * @returns Un Observable dell'Utente appena creato.
-   */
-  addUtente(name: string): Observable<Utente> {
-    return this.http.post<Utente>(this.apiUrl, { name });
+  // Aggiunge un nuovo utente. Payload si aspetta { nome: string }
+  addUtente(data: { nome: string }): Observable<any> {
+    // Usa il percorso Backend corretto: /api/utenti
+    return this.http.post<any>(`${API_BASE_URL}/api/utenti`, data);
   }
 
-  /**
-   * Elimina un utente per ID dal Backend.
-   * @param id L'ID numerico dell'utente da eliminare.
-   * @returns Un Observable vuoto (void) in caso di successo.
-   */
-  deleteUtente(id: number): Observable<void> {
-    // Nota l'uso del template literal per aggiungere l'ID alla fine dell'URL
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  // Elimina un utente per ID
+  deleteUtente(id: number): Observable<any> {
+    // Usa il percorso Backend corretto: /api/utenti/:id
+    return this.http.delete<any>(`${API_BASE_URL}/api/utenti/${id}`);
   }
 }

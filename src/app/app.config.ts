@@ -1,9 +1,14 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http'; // Importante per le chiamate API
+
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideHttpClient() // Abilita i servizi HTTP per l'API
+    provideRouter(routes),
+    // Registra il modulo HttpClient, essenziale per comunicare con l'API
+    provideHttpClient()
   ]
 };
